@@ -1,10 +1,2 @@
-First,IncomeRange, StatedMonthlyIncome and LoanOriginalAmount, 
-these features help me to figure out if this person has the ability to pay his loan.
-
-Second OnTimeProsperPayments, 
-creditGrade can show if this customer can usually pay his loan.
-
-
-ProsperScore
-LenderYield
-LoanOriginalAmount
+Using data from  https://s3.amazonaws.com/udacity-hosted-downloads/ud651/prosperLoanData.csv.
+Using R language to do EDA in this Data.
