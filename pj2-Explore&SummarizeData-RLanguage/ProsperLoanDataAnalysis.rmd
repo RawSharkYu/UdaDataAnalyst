@@ -1,0 +1,362 @@
+TITLE by Anfeng Yu
+========================================================
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+library(ggplot2)
+library(dplyr)
+library(GGally)
+
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+LoanData <- read.csv("prosperLoanData.csv")
+summary(LoanData)
+
+
+```
+
+> **Tip**:This data set contains 113,937 loans with 81 variables on each loan, including loan amount, borrower rate (or interest rate), current loan status, borrower income, borrower employment status, borrower credit history, and the latest payment information.
+
+# Univariate Plots Section
+
+> **Tip**: In this section, you should perform some preliminary exploration of
+your dataset. Run some summaries of the data and create univariate plots to
+understand the structure of the individual variables in your dataset. Don't
+forget to add a comment after each plot or closely-related group of plots!
+There should be multiple code chunks and text sections; the first one below is
+just to help you get started.
+
+First
+
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$BorrowerAPR)&!is.na(LoanData$EstimatedReturn),], cor(BorrowerAPR,EstimatedReturn))
+```
+
+```{r echo=FALSE}
+ggplot(aes(x = CreditGrade), data = LoanData) + geom_bar()
+```
+Most customers have no credit grade. Among customers who have credit grade, most have C credit grade.
+
+```{r echo=FALSE}
+ggplot(aes(x = Term) , data = LoanData) + geom_bar() + scale_x_continuous(breaks = c(12,36,60))
+
+```
+Most customers have 36 terms loan, some have 60 terms loan, very few have 12 terms loan.
+
+
+
+```{r echo=FALSE}
+ggplot(aes(IncomeRange), data = LoanData) + geom_bar()
+
+```
+Most cumtomers' income range from $25,000 ~ $74,999.
+
+
+```{r echo=FALSE}
+
+ggplot(aes(LoanOriginalAmount), data = LoanData) + geom_histogram(binwidth = 1000) + 
+  scale_x_continuous(breaks = seq(0,35000,5000))
+
+```
+Most cumtomers' original loan amout is under $15000, and many of customers loan $5000, $10000, $15000, $20000, $25000. Very few cumstomers loan more than $25000.
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_histogram(binwidth = 50) +
+  scale_x_continuous(breaks = seq(0,2500,200))
+
+```
+This graph is kind like 2 normal distribution's combination. We can make the guess: Among the customers who have loan delinquent, there are two major kinds, one usually has about less delinquent days(about 200 days), but the another kind has much more days(about 2000 days).
+
+```{r echo=FALSE}
+ggplot(aes(x = EstimatedEffectiveYield), data = LoanData) + geom_histogram() + scale_x_continuous(breaks = seq(-0.2,0.3,0.05))
+
+```
+
+
+```{r echo=FALSE}
+
+ggplot(aes(OnTimeProsperPayments), data = LoanData) + geom_histogram() 
+
+```
+
+
+
+
+
+# Univariate Analysis
+
+
+
+### What is the structure of your dataset?
+
+The prosperLoanData is a set of each customers' loan and personal information data.For each customer, this data set has his/her loan amount and rate, salary and job, also estimated effictive yield(earned money).
+
+
+### What is/are the main feature(s) of interest in your dataset?
+
+By my exploration, I think main feature is estimatedEffctiveYield, because this feature reveal by this customer how much interest we company can make.
+
+
+### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+
+First,IncomeRange, StatedMonthlyIncome and LoanOriginalAmount, these features help me to figure out if this person has the ability to pay his loan.
+Second OnTimeProsperPayments, creditGrade can show if this customer can usually pay his loan.
+
+
+
+### Did you create any new variables from existing variables in the dataset?
+
+No.
+
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+
+LoanCurrentDaysDelinquent has a unusual distribution, because most data are 0.
+
+```{r echo=FALSE}
+
+ggplot(aes(x = LoanCurrentDaysDelinquent), data = LoanData) + geom_histogram(binwidth = 50) + scale_x_continuous(breaks = seq(0,2500,200))
+
+```
+
+
+I chose to use data with LoanData$LoanCurrentDaysDelinquent > 0.
+
+```{r echo=FALSE}
+
+ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_histogram(binwidth = 50) +
+  scale_x_continuous(breaks = seq(0,2500,200))
+
+```
+
+
+
+
+# Bivariate Plots Section
+
+
+```{r echo=FALSE}
+LoanData$IncomeRange <- factor(LoanData$IncomeRange)
+levels(LoanData$IncomeRange) <- c("Not displayed","Not employed","$0","$1-24,999","$100,000+","$25,000-49,999","$50,000-74,999","$75,000-99,999" )
+
+
+ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), data = LoanData) + geom_bar(stat = 'summary',fun.y = mean)
+
+```
+Customers with income range of ($50,000~ $74,999) have much higher mean LoanCurrentDaysDelinquent.
+
+```{r echo=FALSE}
+
+ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), data = LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_bar(stat = 'summary',fun.y = mean)
+
+
+```
+But among data set of customers who have already delinquent loan, they have similar mean of LoanCurrentDaysDelinquent.
+
+
+```{r echo=FALSE}
+data_group_delinquent <- group_by(LoanData[LoanData$LoanCurrentDaysDelinquent > 0,],IncomeRange)
+Loan_data_group_delinquent <- summarise(data_group_delinquent,
+                mean_LoanCurrentDaysDelinquent = mean(LoanCurrentDaysDelinquent),
+                median_LoanCurrentDaysDelinquent = median(as.numeric(LoanCurrentDaysDelinquent)),
+                n = n())
+
+
+data_group <- group_by(LoanData,IncomeRange)
+Loan_data_group <- summarise(data_group,
+                mean_LoanCurrentDaysDelinquent = mean(LoanCurrentDaysDelinquent),
+                median_LoanCurrentDaysDelinquent = median(as.numeric(LoanCurrentDaysDelinquent)),
+                n = n())
+
+Loan_data_group_delinquent$n / Loan_data_group$n
+ggplot(aes(x = IncomeRange, y = n / Loan_data_group$n),data = Loan_data_group_delinquent) + geom_bar(stat = "identity")
+```
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = IncomeRange , y = EstimatedEffectiveYield), data = LoanData[]) + geom_boxplot()
+
+```
+
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = OnTimeProsperPayments, y = EstimatedEffectiveYield), data = LoanData) + geom_point()
+
+
+```
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$OnTimeProsperPayments) & !is.na(LoanData$EstimatedEffectiveYield),], cor(OnTimeProsperPayments,EstimatedEffectiveYield))
+
+```
+There is no siginificant relationship between EstimatedEffectiveYield and OnTimeProsperPayments.
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData) + geom_point()
+```
+```{r echo=FALSE}
+
+ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth()
+```
+
+
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$LoanOriginalAmount ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(LoanOriginalAmount ,EstimatedEffectiveYield))
+```
+It's easy to see, with lower loan original amount (less than $15000), there is a much higher EstimatedEffectiveYield.
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = ProsperScore , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+```
+
+
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$ProsperScore ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(ProsperScore ,EstimatedEffectiveYield))
+```
+Also, there is a strong relationship between ProsperScore and EstimatedEffectiveYield. The higher ProsperScore is, the less 
+EstimatedEffectiveYield is.
+
+
+```{r echo=FALSE}
+
+ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+```
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(LenderYield ,EstimatedEffectiveYield))
+```
+There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
+
+```{r echo=FALSE}
+
+ggplot(aes(x = ProsperScore , y = LenderYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$LenderYield),]) + geom_smooth()
+```
+
+```{r echo=FALSE}
+with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$ProsperScore),], cor(LenderYield ,ProsperScore))
+```
+The relationship is even more obvious for LenderYield and ProsperScore.
+
+
+
+# Bivariate Analysis
+
+> **Tip**: As before, summarize what you found in your bivariate explorations
+here. Use the questions below to guide your discussion.
+
+By bivariate explorations, I find there is a strong relationship between EstimatedEffectiveYield with LoanOriginalAmount and ProsperScore.
+
+### Talk about some of the relationships you observed in this part of the \ investigation. How did the feature(s) of interest vary with other features in \ the dataset?
+
+For IncomeRange in $50,000 ~ $74,999, there is no data for EstimatedEffectiveYield.
+
+
+### Did you observe any interesting relationships between the other features \ (not the main feature(s) of interest)?
+1.The relationship is even more obvious for LenderYield and ProsperScore.
+2.Customers with income range of ($50,000~ $74,999) have much higher mean LoanCurrentDaysDelinquent.
+
+### What was the strongest relationship you found?
+There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
+
+# Multivariate Plots Section
+
+> **Tip**: Now it's time to put everything together. Based on what you found in
+the bivariate plots section, create a few multivariate plots to investigate
+more complex interactions between variables. Make sure that the plots that you
+create here are justified by the plots you explored in the previous section. If
+you plan on creating any mathematical models, this is the section where you
+will do that.
+
+```{r echo=FALSE, Multivariate_Plots}
+
+ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth() + facet_grid(~LoanData$ProsperScore)
+
+
+```
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \ investigation. Were there features that strengthened each other in terms of \ looking at your feature(s) of interest?
+
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+
+### Were there any interesting or surprising interactions between features?
+
+For ProsperScore between 1~7, at last EstimatedEffectiveYield will decrease with LenderYield, but for higher ProsperScore, it is always positive ratio.
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \ strengths and limitations of your model.
+
+------
+
+# Final Plots and Summary
+
+> **Tip**: You've done a lot of exploration and have built up an understanding
+of the structure of and relationships between the variables in your dataset.
+Here, you will select three plots from all of your previous exploration to
+present here as a summary of some of your most interesting findings. Make sure
+that you have refined your selected plots for good titling, axis labels (with
+units), and good aesthetic choices (e.g. color, transparency). After each plot,
+make sure you justify why you chose each plot by describing what it shows.
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+ggplot(aes(x = ProsperScore , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+```
+
+### Description One
+
+there is a strong relationship between ProsperScore and EstimatedEffectiveYield. The higher ProsperScore is, the less 
+EstimatedEffectiveYield is.
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+
+ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+```
+
+### Description Two
+
+There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
+
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth() + facet_grid(~LoanData$ProsperScore)
+```
+
+### Description Three
+
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+------
+
+# Reflection
+
+
+For this project, my most siginificant obstacle is to find what is the main feature. After investigating of the data' meaning, I decide EstimatedEffectiveYield as the main feature. 
+
+Then, by bivariate and multivariate exploration, I find generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+
+
+
