@@ -1,0 +1,10 @@
+First,IncomeRange, StatedMonthlyIncome and LoanOriginalAmount, 
+these features help me to figure out if this person has the ability to pay his loan.
+
+Second OnTimeProsperPayments, 
+creditGrade can show if this customer can usually pay his loan.
+
+
+ProsperScore
+LenderYield
+LoanOriginalAmount
