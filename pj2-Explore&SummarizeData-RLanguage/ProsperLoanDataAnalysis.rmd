@@ -1,3 +1,9 @@
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(knitr)
+knitr::opts_chunk$set( echo=FALSE,warning=FALSE,message=FALSE)
+```
+
+
 TITLE by Anfeng Yu
 ========================================================
 
@@ -24,78 +30,163 @@ library(GGally)
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
 LoanData <- read.csv("prosperLoanData.csv")
-summary(LoanData)
-
 
 ```
 
-> **Tip**:This data set contains 113,937 loans with 81 variables on each loan, including loan amount, borrower rate (or interest rate), current loan status, borrower income, borrower employment status, borrower credit history, and the latest payment information.
+This data set contains 113,937 loans with 81 variables on each loan, including 
+loan amount, borrower rate (or interest rate), current loan status, borrower 
+income, borrower employment status, borrower credit history, and the latest 
+payment information.
 
 # Univariate Plots Section
 
-> **Tip**: In this section, you should perform some preliminary exploration of
-your dataset. Run some summaries of the data and create univariate plots to
-understand the structure of the individual variables in your dataset. Don't
-forget to add a comment after each plot or closely-related group of plots!
-There should be multiple code chunks and text sections; the first one below is
-just to help you get started.
 
 First
 
-```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$BorrowerAPR)&!is.na(LoanData$EstimatedReturn),], cor(BorrowerAPR,EstimatedReturn))
-```
 
 ```{r echo=FALSE}
-ggplot(aes(x = CreditGrade), data = LoanData) + geom_bar()
+#The bar graph of CreditGrade's distribution.
+ggplot(aes(x = CreditGrade), data = LoanData) + geom_bar() +
+  xlab("Credit Grade")
 ```
-Most customers have no credit grade. Among customers who have credit grade, most have C credit grade.
+
+Most customers have no credit grade. Among customers who have credit grade, most
+have C credit grade.
 
 ```{r echo=FALSE}
-ggplot(aes(x = Term) , data = LoanData) + geom_bar() + scale_x_continuous(breaks = c(12,36,60))
+#The bar graph of CreditGrade's distribution.
+ggplot(aes(x = ProsperScore), data = LoanData) + geom_bar() +
+  xlab("Prosper Score")
+```
+
+Most customers have 3 ~ 9 prosper score.And I find the prosper scores of customers
+are discrete.
+
+```{r echo=FALSE}
+
+#Set levels of prosper score
+levels(LoanData$ProsperScore) <- c(1,2,3,4,5,6,7,8,9,10,11)
 
 ```
-Most customers have 36 terms loan, some have 60 terms loan, very few have 12 terms loan.
+
+
+```{r echo=FALSE}
+
+#The bar graph of Term's distribution.
+ggplot(aes(x = Term) , data = LoanData) + geom_bar() + scale_x_continuous(breaks
+= c(12,36,60)) 
+
+```
+
+Most customers have 36 terms loan, some have 60 terms loan, very few have 12 
+terms loan.
 
 
 
 ```{r echo=FALSE}
-ggplot(aes(IncomeRange), data = LoanData) + geom_bar()
+#The bar graph of IncomeRange's distribution.
+ggplot(aes(IncomeRange), data = LoanData) + geom_bar() + 
+xlab("Income Range") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
+
 Most cumtomers' income range from $25,000 ~ $74,999.
 
 
 ```{r echo=FALSE}
-
-ggplot(aes(LoanOriginalAmount), data = LoanData) + geom_histogram(binwidth = 1000) + 
-  scale_x_continuous(breaks = seq(0,35000,5000))
+#The histogram graph of LoanOriginalAmount's distribution.
+ggplot(aes(LoanOriginalAmount), data = LoanData) + geom_histogram(binwidth = 1000)+
+  scale_x_continuous(breaks = seq(0,35000,5000)) + 
+xlab("Loan Original Amount")
 
 ```
-Most cumtomers' original loan amout is under $15000, and many of customers loan $5000, $10000, $15000, $20000, $25000. Very few cumstomers loan more than $25000.
+
+Most cumtomers' original loan amout is under $15000, and many of customers loan 
+$5000, $10000, $15000, $20000, $25000. Very few cumstomers loan more than $25000.
 
 
 ```{r echo=FALSE}
+#The histogram graph of LoanCurrentDaysDelinquent's distribution.
+ggplot(aes(x = LoanCurrentDaysDelinquent), 
+       data = LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + 
+  geom_histogram(binwidth = 50)+ 
+  scale_x_continuous(breaks = seq(0,2500,200)) + 
+  xlab("Loan Current Days Delinquent")
 
-ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_histogram(binwidth = 50) +
-  scale_x_continuous(breaks = seq(0,2500,200))
 
 ```
-This graph is kind like 2 normal distribution's combination. We can make the guess: Among the customers who have loan delinquent, there are two major kinds, one usually has about less delinquent days(about 200 days), but the another kind has much more days(about 2000 days).
+
+This graph is kind like 2 normal distribution's combination. We can make the 
+guess: Among the customers who have loan delinquent, there are two major kinds,
+one usually has about less delinquent days(about 200 days), but the another kind
+has much more days(about 2000 days).
 
 ```{r echo=FALSE}
-ggplot(aes(x = EstimatedEffectiveYield), data = LoanData) + geom_histogram() + scale_x_continuous(breaks = seq(-0.2,0.3,0.05))
+#The histogram graph of LoanCurrentDaysDelinquent's distribution.
+
+ggplot(aes(x = EstimatedEffectiveYield), data = LoanData) + geom_histogram() + 
+  scale_x_continuous(breaks = seq(-0.2,0.3,0.05)) + 
+  xlab("Estimated Effective Yield")
 
 ```
+
+By this graph, it's obvious that most customers' EstimatedEffectiveYield is 
+higher than 0.05. Very few customers' EstimatedEffectiveYield is below 0.
+
+```{r echo=FALSE}
+#The histogram graph of LoanCurrentDaysDelinquent's distribution.
+
+ggplot(aes(x = LenderYield), data = LoanData) + geom_histogram() + 
+  scale_x_continuous(breaks = seq(-0.2,0.3,0.05)) + 
+  xlab("Lender Yield")
+
+```
+
+The Lender Yield's distribution is very similar to Estimated Effective Yield,
+except there is no negative value.
+
 
 
 ```{r echo=FALSE}
+#The histogram graph of OnTimeProsperPayments's distribution.
 
-ggplot(aes(OnTimeProsperPayments), data = LoanData) + geom_histogram() 
+ggplot(aes(OnTimeProsperPayments), data = LoanData) + geom_histogram() + 
+  scale_x_continuous(breaks = seq(0,150,10)) + xlab("On Time Prosper Payments")
 
 ```
 
+By this graph, most customers' OnTimeProsperPayments is below 100, and mainly
+distributed around 10 and 35.
 
+
+LoanCurrentDaysDelinquent has a unusual distribution, because most data are 0.
+
+```{r echo=FALSE}
+#The histogram graph of OnTimeProsperPayments's distribution.
+
+ggplot(aes(x = LoanCurrentDaysDelinquent), data = LoanData) + 
+  geom_histogram(binwidth = 50)+ 
+  scale_x_continuous(breaks = seq(0,2500,200)) +
+  xlab("Loan Current Days Delinquent")
+
+```
+
+By this graph, alomost all customers' LoanCurrentDaysDelinquent is 0, for further
+investigation, I choose to use data with LoanData$LoanCurrentDaysDelinquent > 0.
+
+```{r echo=FALSE}
+#The histogram graph of OnTimeProsperPayments(above 0)'s distribution.
+ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + 
+  geom_histogram(binwidth = 50)+ 
+  scale_x_continuous(breaks = seq(0,2500,200)) +
+   xlab("Loan Current Days Delinquent (days above 0)")
+
+```
+
+By this graph,I can see that the distribution of LoanCurrentDaysDelinquent 
+above 0 is like two normal distributions' combination, one with mean 200, 
+another with mean about 1950.
 
 
 
@@ -105,18 +196,24 @@ ggplot(aes(OnTimeProsperPayments), data = LoanData) + geom_histogram()
 
 ### What is the structure of your dataset?
 
-The prosperLoanData is a set of each customers' loan and personal information data.For each customer, this data set has his/her loan amount and rate, salary and job, also estimated effictive yield(earned money).
+The prosperLoanData is a set of each customers' loan and personal information 
+data.For each customer, this data set has his/her loan amount and rate, salary 
+and job, also estimated effictive yield(earned money).
 
 
 ### What is/are the main feature(s) of interest in your dataset?
 
-By my exploration, I think main feature is estimatedEffctiveYield, because this feature reveal by this customer how much interest we company can make.
+By my exploration, I think main feature is estimatedEffctiveYield, because this 
+feature reveal by this customer how much interest we company can make.
 
 
-### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+### What other features in the dataset do you think will help support your 
+###investigation into your feature(s) of interest?
 
-First,IncomeRange, StatedMonthlyIncome and LoanOriginalAmount, these features help me to figure out if this person has the ability to pay his loan.
-Second OnTimeProsperPayments, creditGrade can show if this customer can usually pay his loan.
+First,IncomeRange, StatedMonthlyIncome and LoanOriginalAmount, these features 
+help me to figure out if this person has the ability to pay his loan.
+Second OnTimeProsperPayments, creditGrade can show if this customer can usually 
+pay his loan.
 
 
 
@@ -125,25 +222,9 @@ Second OnTimeProsperPayments, creditGrade can show if this customer can usually 
 No.
 
 
-### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
-
-LoanCurrentDaysDelinquent has a unusual distribution, because most data are 0.
-
-```{r echo=FALSE}
-
-ggplot(aes(x = LoanCurrentDaysDelinquent), data = LoanData) + geom_histogram(binwidth = 50) + scale_x_continuous(breaks = seq(0,2500,200))
-
-```
-
-
-I chose to use data with LoanData$LoanCurrentDaysDelinquent > 0.
-
-```{r echo=FALSE}
-
-ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_histogram(binwidth = 50) +
-  scale_x_continuous(breaks = seq(0,2500,200))
-
-```
+### Of the features you investigated, were there any unusual distributions? Did 
+###you perform any operations on the data to tidy, adjust, or change the form of
+###the data? If so, why did you do this?
 
 
 
@@ -152,211 +233,337 @@ ggplot(aes(x = LoanCurrentDaysDelinquent), data =                             Lo
 
 
 ```{r echo=FALSE}
+#The bar graph of LoanCurrentDaysDelinquent agianst IncomeRange distribution.
 LoanData$IncomeRange <- factor(LoanData$IncomeRange)
-levels(LoanData$IncomeRange) <- c("Not displayed","Not employed","$0","$1-24,999","$100,000+","$25,000-49,999","$50,000-74,999","$75,000-99,999" )
+levels(LoanData$IncomeRange) <- c("Not displayed","Not employed","$0","$1-24,999","$100,000+","$25,000-49,999","$50,000-74,999"
+                                  ,"$75,000-99,999" )
 
 
-ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), data = LoanData) + geom_bar(stat = 'summary',fun.y = mean)
-
+ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), data = LoanData) + 
+  geom_boxplot() + ylab("Loan Current Days Delinquent")+
+  xlab("Income Range") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ 
 ```
-Customers with income range of ($50,000~ $74,999) have much higher mean LoanCurrentDaysDelinquent.
+
+Customers with income range of ($50,000~ $74,999) have much higher mean 
+LoanCurrentDaysDelinquent.
 
 ```{r echo=FALSE}
+#The bar graph of LoanCurrentDaysDelinquent agianst IncomeRange distribution, with
+#LoanCurrentDaysDelinquent above 0.
 
-ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), data = LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) + geom_bar(stat = 'summary',fun.y = mean)
+ggplot(aes(y = LoanCurrentDaysDelinquent, x = IncomeRange), 
+       data = LoanData[LoanData$LoanCurrentDaysDelinquent > 0,]) +
+  geom_boxplot() + ylab("Loan Current Days Delinquent")+
+  xlab("Income Range") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```
-But among data set of customers who have already delinquent loan, they have similar mean of LoanCurrentDaysDelinquent.
 
-
-```{r echo=FALSE}
-data_group_delinquent <- group_by(LoanData[LoanData$LoanCurrentDaysDelinquent > 0,],IncomeRange)
-Loan_data_group_delinquent <- summarise(data_group_delinquent,
-                mean_LoanCurrentDaysDelinquent = mean(LoanCurrentDaysDelinquent),
-                median_LoanCurrentDaysDelinquent = median(as.numeric(LoanCurrentDaysDelinquent)),
-                n = n())
-
-
-data_group <- group_by(LoanData,IncomeRange)
-Loan_data_group <- summarise(data_group,
-                mean_LoanCurrentDaysDelinquent = mean(LoanCurrentDaysDelinquent),
-                median_LoanCurrentDaysDelinquent = median(as.numeric(LoanCurrentDaysDelinquent)),
-                n = n())
-
-Loan_data_group_delinquent$n / Loan_data_group$n
-ggplot(aes(x = IncomeRange, y = n / Loan_data_group$n),data = Loan_data_group_delinquent) + geom_bar(stat = "identity")
-```
-
-
-```{r echo=FALSE}
-
-ggplot(aes(x = IncomeRange , y = EstimatedEffectiveYield), data = LoanData[]) + geom_boxplot()
-
-```
+But among data set of customers who have already delinquent loan, they have 
+similar mean of LoanCurrentDaysDelinquent.
 
 
 
 ```{r echo=FALSE}
 
-ggplot(aes(x = OnTimeProsperPayments, y = EstimatedEffectiveYield), data = LoanData) + geom_point()
+#The boxplot of EstimatedEffectiveYield agianst IncomeRange distribution.
 
+ggplot(aes(x = factor(IncomeRange) , y = EstimatedEffectiveYield), data = LoanData) + 
+  geom_boxplot(outlier.colour = "orange") + ylab("Estimated Effective Yield")+
+  xlab("Income Range") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 ```
-```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$OnTimeProsperPayments) & !is.na(LoanData$EstimatedEffectiveYield),], cor(OnTimeProsperPayments,EstimatedEffectiveYield))
 
-```
-There is no siginificant relationship between EstimatedEffectiveYield and OnTimeProsperPayments.
+It seems there is no strong relationship between IncomeRange and EstimatedEffectiveYield.
 
 
-```{r echo=FALSE}
-
-ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData) + geom_point()
-```
-```{r echo=FALSE}
-
-ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth()
-```
 
 
 ```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$LoanOriginalAmount ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(LoanOriginalAmount ,EstimatedEffectiveYield))
+#The scatter plot of EstimatedEffectiveYield agianst OnTimeProsperPayments distribution.
+
+ggplot(aes(x = OnTimeProsperPayments, y = EstimatedEffectiveYield), data = LoanData) +
+  geom_jitter(alpha = 0.1) + ylab("Estimated Effective Yield")+
+  xlab("On Time Prosper Payments")
+
+
 ```
-It's easy to see, with lower loan original amount (less than $15000), there is a much higher EstimatedEffectiveYield.
+
+By this graph, it is hard to see if there is any strong relationship between 
+OnTimeProsperPayments and EstimatedEffectiveYield.
+
+```{r echo=FALSE} 
+#computing corelationship of OnTimeProsperPayments and EstimatedEffectiveYield
+with(LoanData[!is.na(LoanData$OnTimeProsperPayments) &
+                !is.na(LoanData$EstimatedEffectiveYield),],
+     cor(OnTimeProsperPayments,EstimatedEffectiveYield))
+
+```
+
+By computing corelationship, we can see there is no siginificant relationship 
+between EstimatedEffectiveYield and OnTimeProsperPayments.
 
 
 ```{r echo=FALSE}
-
-ggplot(aes(x = ProsperScore , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+#The scatter plot of EstimatedEffectiveYield agianst LoanOriginalAmount distribution.
+ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LoanOriginalAmount)&!is.na(LoanData$EstimatedEffectiveYield),]) +
+  geom_jitter(alpha = 0.1) + ylab("Estimated Effective Yield")+
+  xlab("Loan Original Amount")
 ```
+
+We can see there may be some relationship between LoanOriginalAmount and EstimatedEffectiveYield.
+
+```{r echo=FALSE}
+#The smooth plot of EstimatedEffectiveYield agianst LoanOriginalAmount distribution.
+ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LoanOriginalAmount)&!is.na(LoanData$EstimatedEffectiveYield),]) +
+  geom_smooth() + ylab("Estimated Effective Yield")+
+  xlab("Loan Original Amount")
+```
+
+We can see, when LoanOriginalAmount is below 15000, the EstimatedEffectiveYield 
+is relatively higher.
+
+
 
 
 ```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$ProsperScore ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(ProsperScore ,EstimatedEffectiveYield))
+#The corelation of EstimatedEffectiveYield agianst LoanOriginalAmount distribution.
+with(LoanData[!is.na(LoanData$LoanOriginalAmount ) & !is.na(LoanData$EstimatedEffectiveYield),],
+     cor(LoanOriginalAmount ,EstimatedEffectiveYield))
 ```
-Also, there is a strong relationship between ProsperScore and EstimatedEffectiveYield. The higher ProsperScore is, the less 
-EstimatedEffectiveYield is.
+
+The corelation between these two features are also proof of this.
 
 
 ```{r echo=FALSE}
-
-ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+#The smooth plot of EstimatedEffectiveYield agianst ProsperScore distribution.
+ggplot(aes(x = factor(ProsperScore) , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$EstimatedEffectiveYield),]) + 
+  geom_boxplot(outlier.colour = "orange") + ylab("Estimated Effective Yield") +
+  xlab("Prosper Score") 
 ```
-```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$EstimatedEffectiveYield),], cor(LenderYield ,EstimatedEffectiveYield))
-```
-There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
 
-```{r echo=FALSE}
+Also, there is a strong relationship between ProsperScore and EstimatedEffectiveYield.
+The higher ProsperScore is, the less EstimatedEffectiveYield is.
 
-ggplot(aes(x = ProsperScore , y = LenderYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$LenderYield),]) + geom_smooth()
-```
+
 
 ```{r echo=FALSE}
-with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$ProsperScore),], cor(LenderYield ,ProsperScore))
+#The corelation between EstimatedEffectiveYield and ProsperScore distribution.
+with(LoanData[!is.na(LoanData$ProsperScore ) & !is.na(LoanData$EstimatedEffectiveYield),],
+     cor(ProsperScore ,EstimatedEffectiveYield))
 ```
+
+The corelation also proves this.
+
+
+```{r echo=FALSE}
+#The smooth plot of EstimatedEffectiveYield agianst LenderYield distribution.
+ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),]) +
+  geom_smooth() + ylab("Estimated Effective Yield")+  xlab("Lender Yield")
+```
+
+There is a very strong positive ratio relationship between LenderYield and 
+EstimatedEffectiveYield, however when LenderYield is higher than 0.3, 
+EstimatedEffectiveYield goes downwards.
+
+```{r echo=FALSE}
+#The corelation between EstimatedEffectiveYield and LenderYield distribution.
+with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$EstimatedEffectiveYield),], 
+     cor(LenderYield ,EstimatedEffectiveYield))
+```
+
+The corelation also proves this.
+
+
+```{r echo=FALSE}
+#The smooth plot of LenderYield agianst ProsperScore distribution.
+ggplot(aes(x = factor(ProsperScore) , y = LenderYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$LenderYield),]) + 
+  geom_boxplot(outlier.colour = "orange") + ylab("Lender Yield")+ 
+  xlab("Prosper Score")
+```
+
 The relationship is even more obvious for LenderYield and ProsperScore.
+
+```{r echo=FALSE}
+# The corelation between LenderYield and ProsperScore
+with(LoanData[!is.na(LoanData$LenderYield ) & !is.na(LoanData$ProsperScore),], 
+     cor(LenderYield ,ProsperScore))
+```
+
+The corelation also proves this.
 
 
 
 # Bivariate Analysis
 
-> **Tip**: As before, summarize what you found in your bivariate explorations
-here. Use the questions below to guide your discussion.
+By bivariate explorations, I find there is a strong relationship between 
+EstimatedEffectiveYield with LoanOriginalAmount and ProsperScore.
 
-By bivariate explorations, I find there is a strong relationship between EstimatedEffectiveYield with LoanOriginalAmount and ProsperScore.
-
-### Talk about some of the relationships you observed in this part of the \ investigation. How did the feature(s) of interest vary with other features in \ the dataset?
+### Talk about some of the relationships you observed in this part of the \ 
+###investigation.How did the feature(s) of interest vary with other features in  the dataset?
 
 For IncomeRange in $50,000 ~ $74,999, there is no data for EstimatedEffectiveYield.
 
 
-### Did you observe any interesting relationships between the other features \ (not the main feature(s) of interest)?
+### Did you observe any interesting relationships between the other features \ 
+###(not the main feature(s) of interest)?
 1.The relationship is even more obvious for LenderYield and ProsperScore.
-2.Customers with income range of ($50,000~ $74,999) have much higher mean LoanCurrentDaysDelinquent.
+2.Customers with income range of ($50,000~ $74,999) have much higher mean 
+LoanCurrentDaysDelinquent.
 
 ### What was the strongest relationship you found?
-There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
+There is a very strong positive ratio relationship between LenderYield and 
+EstimatedEffectiveYield, however when LenderYield is higher than 0.3, 
+EstimatedEffectiveYield goes downwards.
 
 # Multivariate Plots Section
 
-> **Tip**: Now it's time to put everything together. Based on what you found in
-the bivariate plots section, create a few multivariate plots to investigate
-more complex interactions between variables. Make sure that the plots that you
-create here are justified by the plots you explored in the previous section. If
-you plan on creating any mathematical models, this is the section where you
-will do that.
 
 ```{r echo=FALSE, Multivariate_Plots}
-
-ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth() + facet_grid(~LoanData$ProsperScore)
+#The smooth plot of EstimatedEffectiveYield agianst LenderYield distribution 
+#facet by ProsperScore.
+ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + 
+  geom_smooth() + facet_wrap(~LoanData$ProsperScore) + 
+  ylab("Estimated Effective Yield")+ xlab("Lender Yield") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```
-These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+
+
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore)
+clearly show that, generally LenderYield has a positive ratio relationship with
+EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with 
+ProsperScore's increasing.
+
+```{r echo=FALSE}
+#The smooth plot of EstimatedEffectiveYield agianst LoanCurrentDaysDelinquent 
+#distribution facet by ProsperScore.
+
+ggplot(aes(x = LoanCurrentDaysDelinquent, y = EstimatedEffectiveYield), data = LoanData) + 
+  geom_smooth() + facet_wrap(~LoanData$ProsperScore) + 
+  ylab("Estimated Effective Yield")+ xlab("Loan Current Days Delinquent") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+```
+
+By this graph, it is obvious that, with higher Loan Current Days Delinquent, the
+customers' Estimated Effective Yield will siginificantly drop down. But, if this
+customer has high ProsperScore, the Estimated Effective Yield will change very 
+little with Loan Current Days Delinquent.It can be illstrated as with higher 
+ProsperScore, even if this customer has loan delinquent, bank can still estimate
+a high  Effective Yield.
+
+
+```{r echo=FALSE}
+#The smooth plot of EstimatedEffectiveYield agianst LoanOriginalAmount distribution
+#facet by ProsperScore.
+
+ggplot(aes(x = LoanOriginalAmount, y = EstimatedEffectiveYield), data = LoanData) +
+  geom_smooth() + facet_wrap(~LoanData$ProsperScore) + 
+  ylab("Estimated Effective Yield")+ xlab("Loan Original Amount") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+By this graph, we can see, with higher loan original amount, the estimated effective
+yield is relatively low, and with higher prosper score, the estimated effective 
+yield will become lower.
+
+
 
 # Multivariate Analysis
 
-### Talk about some of the relationships you observed in this part of the \ investigation. Were there features that strengthened each other in terms of \ looking at your feature(s) of interest?
+### Talk about some of the relationships you observed in this part of the \ 
+###investigation. Were there features that strengthened each other in terms of \
+###looking at your feature(s) of interest?
 
-These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore)
+clearly show that, generally LenderYield has a positive ratio relationship with
+EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with
+ProsperScore's increasing.
 
 ### Were there any interesting or surprising interactions between features?
 
-For ProsperScore between 1~7, at last EstimatedEffectiveYield will decrease with LenderYield, but for higher ProsperScore, it is always positive ratio.
+For ProsperScore between 1~7, at last EstimatedEffectiveYield will decrease with
+LenderYield, but for higher ProsperScore, it is always positive ratio.
 
-### OPTIONAL: Did you create any models with your dataset? Discuss the \ strengths and limitations of your model.
+### OPTIONAL: Did you create any models with your dataset? Discuss the \ 
+###strengths and limitations of your model.
 
 ------
 
 # Final Plots and Summary
 
-> **Tip**: You've done a lot of exploration and have built up an understanding
-of the structure of and relationships between the variables in your dataset.
-Here, you will select three plots from all of your previous exploration to
-present here as a summary of some of your most interesting findings. Make sure
-that you have refined your selected plots for good titling, axis labels (with
-units), and good aesthetic choices (e.g. color, transparency). After each plot,
-make sure you justify why you chose each plot by describing what it shows.
+
 
 ### Plot One
 ```{r echo=FALSE, Plot_One}
-ggplot(aes(x = ProsperScore , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$ProsperScore)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+#The boxplot plot of EstimatedEffectiveYield agianst ProsperScore distribution.
+ggplot(aes(x = factor(ProsperScore) , y = EstimatedEffectiveYield), data =
+         LoanData[!is.na(LoanData$ProsperScore)&
+        !is.na(LoanData$EstimatedEffectiveYield),])+
+  geom_boxplot(outlier.colour = "orange") + 
+  ylab("Estimated Effective Yield")+ xlab("Prosper Score") +
+  ggtitle("boxplot plot of EstimatedEffectiveYield vs ProsperScore")
+
 ```
+
 
 ### Description One
 
-there is a strong relationship between ProsperScore and EstimatedEffectiveYield. The higher ProsperScore is, the less 
-EstimatedEffectiveYield is.
+there is a strong relationship between ProsperScore and EstimatedEffectiveYield.
+The higher ProsperScore is, the less EstimatedEffectiveYield is.
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
-
-ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),]) + geom_smooth()
+#The smooth plot of EstimatedEffectiveYield agianst LenderYield distribution.
+ggplot(aes(x = LenderYield , y = EstimatedEffectiveYield), data = LoanData[!is.na(LoanData$LenderYield)&!is.na(LoanData$EstimatedEffectiveYield),])+ 
+  geom_smooth() + ylab("Estimated Effective Yield")+ xlab("Lender Yield") +
+  ggtitle("smooth line plot of EstimatedEffectiveYield vs LenderYield")
 ```
 
 ### Description Two
 
-There is a very strong positive ratio relationship between LenderYield and EstimatedEffectiveYield, however when LenderYield is higher than 0.3, EstimatedEffectiveYield goes downwards.
+There is a very strong positive ratio relationship between LenderYield and 
+EstimatedEffectiveYield, however when LenderYield is higher than 0.3, 
+EstimatedEffectiveYield goes downwards.
 
 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
-ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + geom_smooth() + facet_grid(~LoanData$ProsperScore)
+#The smooth plot of EstimatedEffectiveYield agianst LenderYield distribution 
+#facet by ProsperScore.
+ggplot(aes(x = LenderYield, y = EstimatedEffectiveYield), data = LoanData) + 
+  geom_smooth() + facet_wrap(~LoanData$ProsperScore) + 
+  ylab("Estimated Effective Yield")+ xlab("Lender Yield") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("smooth line plot of EstimatedEffectiveYield vs LenderYield facet by ProsperScore.")
 ```
+
 
 ### Description Three
 
-These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore) clearly show that, generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+These plots(x is LenderYield, y is EstimatedEffectiveYield, faceted by ProsperScore)
+clearly show that, generally LenderYield has a positive ratio relationship with
+EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with
+ProsperScore's increasing.
+
+
 ------
 
 # Reflection
 
 
-For this project, my most siginificant obstacle is to find what is the main feature. After investigating of the data' meaning, I decide EstimatedEffectiveYield as the main feature. 
+For this project, my most siginificant obstacle is to find what is the main feature.
+Finally I decided EstimatedEffectiveYield as my main feature because it is related
+with profit the bank can earn for each customer. However, there still are some
+other features very important, for example, Loan Current Days Delinquent, which
+may show if this customer can pay his/her credit or not.
 
-Then, by bivariate and multivariate exploration, I find generally LenderYield has a positive ratio relationship with EstimatedEffectiveYield, and  EstimatedEffectiveYield will decrease a little with ProsperScore's increasing.
+So, for future's further investigation, I would like to explore other features 
+from other perspective, and at last make a fine predictive model to decide should
+the bank  loan money to some customer or not.
 
 
 
